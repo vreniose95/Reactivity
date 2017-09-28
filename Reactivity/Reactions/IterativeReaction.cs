@@ -233,7 +233,7 @@ namespace Reactivity.Reactions
 
 					//var currentValue2 = targetDependendencyObject.ReadLocalValue(AnimationTemplate.Emitter.Property) as double?;
 
-					var animationEmitterBaseCore = (IAnimationEmitterBaseCore)emitter;
+					var animationEmitterBaseCore = (IAnimationTimelineEmitter)emitter;
 
 					if (currentValue == null)
 					{

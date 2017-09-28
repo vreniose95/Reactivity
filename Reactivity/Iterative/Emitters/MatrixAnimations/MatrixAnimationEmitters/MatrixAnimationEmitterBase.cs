@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
+using Ccr.PresentationCore.Helpers.DependencyHelpers;
 using Core.Extensions;
 using Core.Helpers.CLREventHelpers;
 using Core.Helpers.DependencyHelpers;
@@ -9,61 +10,77 @@ using Reactivity.Iterative.Emitters.MatrixAnimations.MatrixComposition;
 
 namespace Reactivity.Iterative.Emitters.MatrixAnimations.MatrixAnimationEmitters
 {
-	public abstract class MatrixAnimationEmitterBase : AnimationEmitterBase
+	public abstract class MatrixAnimationEmitterBase 
+		: AnimationEmitterBase
 	{
 		public static readonly DependencyProperty MatrixCompositionProperty = DP.Register(
 			new Meta<MatrixAnimationEmitterBase, MatrixCompositionBase>(new LinearMatrixComposition()));
+
 		public MatrixCompositionBase MatrixComposition
 		{
-			get { return (MatrixCompositionBase)GetValue(MatrixCompositionProperty); }
-			set { SetValue(MatrixCompositionProperty, value); }
+			get => (MatrixCompositionBase)GetValue(MatrixCompositionProperty);
+			set => SetValue(MatrixCompositionProperty, value);
 		}
 	}
 	[XamlSetTypeConverter(nameof(ReceiveTypeConverter))]
-	public abstract class MatrixAnimationEmitterBase<T> : MatrixAnimationEmitterBase where T : struct
+	public abstract class MatrixAnimationEmitterBase<TValue>
+		: MatrixAnimationEmitterBase
+			where TValue
+				: struct
 	{
 		public static readonly DependencyProperty FromProperty = DP.Register(
-			new Meta<MatrixAnimationEmitterBase<T>, AnimationValue<T>>(new LiteralAnimationValue<T>(null),
+			new Meta<MatrixAnimationEmitterBase<TValue>, AnimatedValueBase<TValue>>(
+				new LiteralAnimatedValue<TValue>(null),
 				FromPropertyChangedCallback), IsValidAnimationValue);
 
 		public static readonly DependencyProperty ToProperty = DP.Register(
-			new Meta<MatrixAnimationEmitterBase<T>, AnimationValue<T>>(new LiteralAnimationValue<T>(null),
+			new Meta<MatrixAnimationEmitterBase<TValue, AnimatedValueBase<TValue>>(
+				new LiteralAnimatedValue<TValue>(null),
 				ToPropertyChangedCallback), IsValidAnimationValue);
 
 
-		public AnimationValue<T> From
+		public AnimatedValueBase<TValue> From
 		{
-			get { return (AnimationValue<T>)GetValue(FromProperty); }
-			set { SetValue(FromProperty, value); }
+			get => (AnimatedValueBase<TValue>)GetValue(FromProperty);
+			set => SetValue(FromProperty, value);
 		}
-		public AnimationValue<T> To
+		public AnimatedValueBase<TValue> To
 		{
-			get { return (AnimationValue<T>)GetValue(ToProperty); }
-			set { SetValue(ToProperty, value); }
-		}
-
-		protected sealed override IAnimationValueCore FromBase => From;
-		protected sealed override IAnimationValueCore ToBase => To;
-
-		//protected sealed override ParameterizedEventHandler<IAnimationValueCore> ToPropertyChangedBase => From;
-		//protected sealed override ParameterizedEventHandler<IAnimationValueCore> ToPropertyChangedBase => To;
-
-
-		public event ParameterizedEventHandler<AnimationValue<T>> FromPropertyChanged;
-		public event ParameterizedEventHandler<AnimationValue<T>> ToPropertyChanged;
-
-
-		private static void FromPropertyChangedCallback(MatrixAnimationEmitterBase<T> i, DPChangedEventArgs<AnimationValue<T>> e)
-		{
-			i.FromPropertyChanged.Raise(e.NewValue);
-		}
-		private static void ToPropertyChangedCallback(MatrixAnimationEmitterBase<T> i, DPChangedEventArgs<AnimationValue<T>> e)
-		{
-			i.ToPropertyChanged.Raise(e.NewValue);
+			get => (AnimatedValueBase<TValue>)GetValue(ToProperty);
+			set => SetValue(ToProperty, value);
 		}
 
+		protected sealed override IAnimatedValue FromBase
+		{
+			get => From; 
+		}
+		protected sealed override IAnimatedValue ToBase
+		{
+			get => To;
+		}
+		
 
-		protected sealed override void HookFromPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> from)
+
+		private static void FromPropertyChangedCallback(
+			MatrixAnimationEmitterBase<TValue> @this, 
+			DPChangedEventArgs<AnimatedValueBase<TValue>> args)
+		{
+			@this.FromPropertyChanged?.Invoke(args.NewValue);
+		}
+		private static void ToPropertyChangedCallback(
+			MatrixAnimationEmitterBase<TValue> @this, 
+			DPChangedEventArgs<AnimatedValueBase<TValue>> args)
+		{
+			@this.ToPropertyChanged?.Invoke(args.NewValue);
+		}
+
+
+		public event AnimatedValueBaseChangedHandler<TValue> FromPropertyChanged;
+		public event AnimatedValueBaseChangedHandler<TValue> ToPropertyChanged;
+
+
+		protected sealed override void HookFromPropertyChangedBase(
+			AnimatedValueBaseChangedHandler<TValue> from)
 		{
 			FromPropertyChanged += from;
 		}

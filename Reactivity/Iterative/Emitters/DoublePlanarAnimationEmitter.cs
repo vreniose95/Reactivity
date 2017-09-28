@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
+using Ccr.Core.Extensions;
+using Ccr.PresentationCore.Helpers.DependencyHelpers;
 using Core.Extensions;
 using Core.Helpers;
 using Core.Helpers.DependencyHelpers;
@@ -12,7 +14,8 @@ namespace Reactivity.Iterative.Emitters
 {
 	[XamlSetMarkupExtension(nameof(ReceiveMarkupExtension))]
 	[XamlSetTypeConverter(nameof(ReceiveTypeConverter))]
-	public class DoublePlanarAnimationEmitter : AnimationEmitterBase<double>
+	public class DoublePlanarAnimationEmitter
+		: AnimationEmitterBase<double>
 	{
 		private bool _deferMarkupExtensionResolve;
 		private object _targetObject;
@@ -28,13 +31,13 @@ namespace Reactivity.Iterative.Emitters
 
 		public int PlanarGroupCount
 		{
-			get { return (int)GetValue(PlanarGroupCountProperty); }
-			set { SetValue(PlanarGroupCountProperty, value); }
+			get => (int)GetValue(PlanarGroupCountProperty);
+			set => SetValue(PlanarGroupCountProperty, value);
 		}
 		public IterativeOffset PlanarAxisIterativeOffset
 		{
-			get { return (IterativeOffset)GetValue(PlanarAxisIterativeOffsetProperty); }
-			set { SetValue(PlanarAxisIterativeOffsetProperty, value); }
+			get => (IterativeOffset)GetValue(PlanarAxisIterativeOffsetProperty);
+			set => SetValue(PlanarAxisIterativeOffsetProperty, value);
 		}
 
 
@@ -84,34 +87,37 @@ namespace Reactivity.Iterative.Emitters
 			};
 		}
 
-		protected int getEffectiveHorizontalAxisSteps(int totalSteps)
+		protected int getEffectiveHorizontalAxisSteps(
+			int totalSteps)
 		{
-			if (totalSteps < PlanarGroupCount)
-			{
-				return totalSteps;
-			}
-			return PlanarGroupCount;
+			return totalSteps < PlanarGroupCount
+				? totalSteps
+				: PlanarGroupCount;
 		}
 
-		protected int getEffectiveVerticalAxisSteps(int totalSteps)
+		protected int getEffectiveVerticalAxisSteps(
+			int totalSteps)
 		{
-			//if (totalSteps < PlanarGroupCount)
-			//{
-			//	return 1;
-			//}
-			var rowSteps = (int)Math.Ceiling((double)totalSteps / PlanarGroupCount);
+			var rowSteps = (int)Math.Ceiling(
+				(double)totalSteps / PlanarGroupCount);
 			return rowSteps;
 		}
 
-		protected Vector getPositionInPlanarMatrix(int totalSteps, int currentStep)
+		protected Vector getPositionInPlanarMatrix(
+			int totalSteps,
+			int currentStep)
 		{
 			var horizontalAxisSteps = getEffectiveHorizontalAxisSteps(totalSteps);
 			var verticalAxisSteps = getEffectiveVerticalAxisSteps(totalSteps);
 
-			var verticalRowNumber = (int)Math.Floor((double)currentStep / horizontalAxisSteps);
-			var horizontalColumnNumber = currentStep - (verticalRowNumber * PlanarGroupCount);
+			var verticalRowNumber = (int)Math.Floor(
+				(double)currentStep / horizontalAxisSteps);
+			var horizontalColumnNumber = currentStep - 
+				verticalRowNumber * PlanarGroupCount;
 
-			return new Vector(verticalRowNumber, horizontalColumnNumber);
+			return new Vector(
+				verticalRowNumber, 
+				horizontalColumnNumber);
 		}
 
 
@@ -120,40 +126,24 @@ namespace Reactivity.Iterative.Emitters
 			base.OnAttached();
 
 			if (_deferMarkupExtensionResolve)
-			{
 				ReceiveMarkupExtension(_targetObject, _eventArgs);
-			}
 		}
 
 
-		public static void ReceiveMarkupExtension(object targetObject, XamlSetMarkupExtensionEventArgs eventArgs)
+		public static void ReceiveMarkupExtension(
+			object targetObject, 
+			XamlSetMarkupExtensionEventArgs eventArgs)
 		{
-			//TypeConverterInjectionCore.HandlePropertySetFromMarkupExtension(targetObject, eventArgs);
-
-			//if (eventArgs.Handled)
-			//	return;
-
-			if (targetObject == null)
-				throw new ArgumentNullException(nameof(targetObject));
-			if (eventArgs == null)
-				throw new ArgumentNullException(nameof(eventArgs));
+			targetObject.IsNotNull(nameof(targetObject));
+			eventArgs.IsNotNull(nameof(eventArgs));
 
 			var planarAnimationEmitter = targetObject as DoublePlanarAnimationEmitter;
 			if (planarAnimationEmitter == null)
 				return;
-
-			//var unresolvedValue = eventArgs.Value;
-			//if (eventArgs.Value.GetType().Name == "TypeConverterMarkupExtension")
-			//{
-			//	var me = (MarkupExtension) eventArgs.Value;
-			//	var pv = me.ProvideValue(eventArgs.ServiceProvider);
-			//	unresolvedValue = eventArgs.Value.GetFieldValue<object>("_value");
-			//}
-
+			
 			switch (eventArgs.Member.Name)
 			{
-			
-				case "PlanarGroupCount":
+				case nameof(PlanarGroupCount):
 					if (!planarAnimationEmitter.IsAssociated)
 					{
 						planarAnimationEmitter._targetObject = targetObject;

@@ -8,12 +8,16 @@ namespace Reactivity.Core
 		private string name;
 		private FrameworkElement nameScopeReferenceElement;
 
+		private DependencyObject ResolvedObject { get; set; }
+
+		private bool PendingReferenceElementLoad { get; set; }
+
+		private bool HasAttempedResolve { get; set; }
+
+
 		public string Name
 		{
-			get
-			{
-				return name;
-			}
+			get => name;
 			set
 			{
 				var @object = Object;
@@ -34,10 +38,7 @@ namespace Reactivity.Core
 
 		public FrameworkElement NameScopeReferenceElement
 		{
-			get
-			{
-				return nameScopeReferenceElement;
-			}
+			get => nameScopeReferenceElement;
 			set
 			{
 				var referenceElement = NameScopeReferenceElement;
@@ -50,22 +51,18 @@ namespace Reactivity.Core
 		{
 			get
 			{
-				if (NameScopeReferenceElement == null || !React.IsElementLoaded(NameScopeReferenceElement))
+				if (NameScopeReferenceElement == null 
+					|| !React.IsElementLoaded(NameScopeReferenceElement))
 					return null;
 				return GetActualNameScopeReference(NameScopeReferenceElement);
 			}
 		}
-
-		private DependencyObject ResolvedObject { get; set; }
-
-		private bool PendingReferenceElementLoad { get; set; }
-
-		private bool HasAttempedResolve { get; set; }
-
+		
 
 		public event EventHandler<NameResolvedEventArgs> ResolvedElementChanged;
 
-		private void OnNameScopeReferenceElementChanged(FrameworkElement oldNameScopeReference)
+		private void OnNameScopeReferenceElementChanged(
+			FrameworkElement oldNameScopeReference)
 		{
 			if (PendingReferenceElementLoad)
 			{
@@ -76,7 +73,8 @@ namespace Reactivity.Core
 			UpdateObjectFromName(Object);
 		}
 		
-		private void UpdateObjectFromName(DependencyObject oldObject)
+		private void UpdateObjectFromName(
+			DependencyObject oldObject)
 		{
 			var dependencyObject = (DependencyObject)null;
 			ResolvedObject = null;
@@ -102,26 +100,36 @@ namespace Reactivity.Core
 			OnObjectChanged(oldObject, Object);
 		}
 
-		private void OnObjectChanged(DependencyObject oldTarget, DependencyObject newTarget)
+		private void OnObjectChanged(
+			DependencyObject oldTarget, 
+			DependencyObject newTarget)
 		{
-			ResolvedElementChanged?.Invoke(this, new NameResolvedEventArgs(oldTarget, newTarget));
+			ResolvedElementChanged?.Invoke(
+				this, 
+				new NameResolvedEventArgs(oldTarget, newTarget));
 		}
 		
-		private FrameworkElement GetActualNameScopeReference(FrameworkElement initialReferenceElement)
+		private FrameworkElement GetActualNameScopeReference(
+			FrameworkElement initialReferenceElement)
 		{
 			var frameworkElement = initialReferenceElement;
+
 			if (IsNameScope(initialReferenceElement))
 				frameworkElement = initialReferenceElement.Parent as FrameworkElement ?? frameworkElement;
+
 			return frameworkElement;
 		}
 		
-		private bool IsNameScope(FrameworkElement frameworkElement)
+		private bool IsNameScope(
+			FrameworkElement frameworkElement)
 		{
 			var frameworkElement1 = frameworkElement.Parent as FrameworkElement;
 			return frameworkElement1?.FindName(Name) != null;
 		}
 		
-		private void OnNameScopeReferenceLoaded(object sender, RoutedEventArgs e)
+		private void OnNameScopeReferenceLoaded(
+			object sender, 
+			RoutedEventArgs e)
 		{
 			PendingReferenceElementLoad = false;
 			NameScopeReferenceElement.Loaded -= OnNameScopeReferenceLoaded;

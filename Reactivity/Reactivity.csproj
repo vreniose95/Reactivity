@@ -30,22 +30,50 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ccr.Core">
+      <HintPath>..\..\Ccr\Ccr.Core\bin\Debug\Ccr.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Ccr.Introspective">
+      <HintPath>..\..\Ccr\Ccr.Introspective\bin\Debug\Ccr.Introspective.dll</HintPath>
+    </Reference>
+    <Reference Include="Ccr.MaterialDesign">
+      <HintPath>..\..\Ccr\Ccr.MaterialDesign\bin\Debug\Ccr.MaterialDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="Ccr.MDHybrid">
+      <HintPath>..\..\Ccr\Ccr.MDHybrid\bin\Debug\Ccr.MDHybrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Ccr.PresentationCore">
+      <HintPath>..\..\Ccr\Ccr.PresentationCore\bin\Debug\Ccr.PresentationCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Ccr.Xaml">
+      <HintPath>..\..\Ccr\Ccr.Xaml\bin\Debug\Ccr.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\AnimatedValueBase.cs" />
+    <Compile Include="Animation\AnimationTemplate.cs" />
+    <Compile Include="Animation\AnimationValueConverter.cs" />
+    <Compile Include="Animation\CustomDurationConverter.cs" />
+    <Compile Include="Animation\CustomTimeSpanConverter.cs" />
+    <Compile Include="Animation\CustomXamlTimeSpan.cs" />
     <Compile Include="Animation\IAnimatedValue.cs" />
+    <Compile Include="Animation\IterativeOffset.cs" />
     <Compile Include="Animation\LiteralAnimatedValue.cs" />
     <Compile Include="Animation\RelativeAnimatedValue.cs" />
-    <Compile Include="Class1.cs" />
-    <Compile Include="Class2.cs" />
+    <Compile Include="Animation\Stylization\AnimationStyle.cs" />
+    <Compile Include="Animation\__TimeSpanParse.cs" />
     <Compile Include="Conditions\And.cs" />
     <Compile Include="Conditions\ComparisonType.cs" />
     <Compile Include="Conditions\ComparisonTypeConverter.cs" />
@@ -63,8 +91,9 @@
     <Compile Include="Core\NameResolver.cs" />
     <Compile Include="Core\__Helper.cs" />
     <Compile Include="Core\__SR.cs" />
-    <Compile Include="Exceptions\ExceptionMessages.cs" />
     <Compile Include="Exceptions\ReactionExecutionException.cs" />
+    <Compile Include="Iterative\Emitters\AnimatedValueBaseChangedHandler.cs" />
+    <Compile Include="Iterative\Emitters\AnimatedValueChangedHandler.cs" />
     <Compile Include="Iterative\Emitters\AnimationEmitterBase.cs" />
     <Compile Include="Iterative\Emitters\AnimationMap\AnimationMapBase.cs" />
     <Compile Include="Iterative\Emitters\AnimationMap\LinearAnimationMap.cs" />
@@ -72,7 +101,7 @@
     <Compile Include="Iterative\Emitters\DoubleAnimationEmitter.cs" />
     <Compile Include="Iterative\Emitters\DoublePlanarAnimationEmitter.cs" />
     <Compile Include="Iterative\Emitters\GeometricMapAnimationTimelineEmitter.cs" />
-    <Compile Include="Iterative\Emitters\IAnimationEmitterBaseCore.cs" />
+    <Compile Include="Iterative\Emitters\IAnimationTimelineEmitter.cs" />
     <Compile Include="Iterative\Emitters\IterativeOffsetMode.cs" />
     <Compile Include="Iterative\Emitters\MatrixAnimations\MatrixAnimationEmitters\DoubleMatrixAnimationEmitter.cs" />
     <Compile Include="Iterative\Emitters\MatrixAnimations\MatrixAnimationEmitters\MatrixAnimationEmitterBase.cs" />

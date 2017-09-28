@@ -3,6 +3,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
+using Ccr.PresentationCore.Helpers.DependencyHelpers;
+using Ccr.Xaml.Markup.TypeConverterInjection;
 using Core.Extensions;
 using Core.Helpers.CLREventHelpers;
 using Core.Helpers.DependencyHelpers;
@@ -15,7 +17,9 @@ using Reactivity.Iterative.Targeting.Core;
 namespace Reactivity.Iterative.Emitters
 {
 	[XamlSetTypeConverter(nameof(ReceiveTypeConverter))]
-	public abstract class AnimationEmitterBase : AttachableBase, IAnimationEmitterBaseCore
+	public abstract class AnimationEmitterBase 
+		: AttachableBase, 
+			IAnimationTimelineEmitter
 	{
 		public static readonly DependencyProperty AnimationStyleProperty = DP.Register(
 			new Meta<AnimationEmitterBase, AnimationStyle>(null, onAnimationStyleChanged));
@@ -50,69 +54,71 @@ namespace Reactivity.Iterative.Emitters
 
 		public AnimationStyle AnimationStyle
 		{
-			get { return (AnimationStyle)GetValue(AnimationStyleProperty); }
-			set { SetValue(AnimationStyleProperty, value); }
+			get => (AnimationStyle)GetValue(AnimationStyleProperty);
+			set => SetValue(AnimationStyleProperty, value);
 		}
 		public SelectorExpressionTree SubSelectorExpression
 		{
-			get { return (SelectorExpressionTree)GetValue(SubSelectorExpressionProperty); }
-			set { SetValue(SubSelectorExpressionProperty, value); }
+			get => (SelectorExpressionTree)GetValue(SubSelectorExpressionProperty);
+			set => SetValue(SubSelectorExpressionProperty, value);
 		}
 		public DependencyProperty Property
 		{
-			get { return (DependencyProperty)GetValue(PropertyProperty); }
-			set { SetValue(PropertyProperty, value); }
+			get => (DependencyProperty)GetValue(PropertyProperty);
+			set => SetValue(PropertyProperty, value);
 		}
 		public bool ApplyFromBeforeOffset
 		{
-			get { return (bool)GetValue(ApplyFromBeforeOffsetProperty); }
-			set { SetValue(ApplyFromBeforeOffsetProperty, value); }
+			get => (bool)GetValue(ApplyFromBeforeOffsetProperty);
+			set => SetValue(ApplyFromBeforeOffsetProperty, value);
 		}
 		//[InjectTypeConverter(typeof(CustomDurationConverter))]
 		public Duration Duration
 		{
-			get { return (Duration)GetValue(DurationProperty); }
-			set { SetValue(DurationProperty, value); }
+			get => (Duration)GetValue(DurationProperty);
+			set => SetValue(DurationProperty, value);
 		}
 		//[InjectTypeConverter(typeof(CustomTimeSpanConverter))]
 		public TimeSpan BeginTime
 		{
-			get { return (TimeSpan)GetValue(BeginTimeProperty); }
-			set { SetValue(BeginTimeProperty, value); }
+			get => (TimeSpan)GetValue(BeginTimeProperty);
+			set => SetValue(BeginTimeProperty, value);
 		}
 		public IEasingFunction EasingFunction
 		{
-			get { return (IEasingFunction)GetValue(EasingFunctionProperty); }
-			set { SetValue(EasingFunctionProperty, value); }
+			get => (IEasingFunction)GetValue(EasingFunctionProperty);
+			set => SetValue(EasingFunctionProperty, value);
 		}
 		public bool OffsetBeginTime
 		{
-			get { return (bool)GetValue(OffsetBeginTimeProperty); }
-			set { SetValue(OffsetBeginTimeProperty, value); }
+			get => (bool)GetValue(OffsetBeginTimeProperty);
+			set => SetValue(OffsetBeginTimeProperty, value);
 		}
 		public double SpeedRatio
 		{
-			get { return (double)GetValue(SpeedRatioProperty); }
-			set { SetValue(SpeedRatioProperty, value); }
+			get => (double)GetValue(SpeedRatioProperty);
+			set => SetValue(SpeedRatioProperty, value);
 		}
 		public IterativeOffset IterativeOffset
 		{
-			get { return (IterativeOffset)GetValue(IterativeOffsetProperty); }
-			set { SetValue(IterativeOffsetProperty, value); }
+			get => (IterativeOffset)GetValue(IterativeOffsetProperty);
+			set => SetValue(IterativeOffsetProperty, value);
 		}
 
 
 
-		private static void onAnimationStyleChanged(AnimationEmitterBase i, DPChangedEventArgs<AnimationStyle> e)
+		private static void onAnimationStyleChanged(
+			AnimationEmitterBase @this, 
+			DPChangedEventArgs<AnimationStyle> args)
 		{
-			if (e.NewValue == null)
-			{
+			if (args.NewValue == null)
 				return;
-			}
-			i.applyAnimationStyle(e.NewValue);
+			
+			@this.applyAnimationStyle(args.NewValue);
 		}
 
-		private void applyAnimationStyle(AnimationStyle animationStyle)
+		private void applyAnimationStyle(
+			AnimationStyle animationStyle)
 		{
 			foreach (var setter in animationStyle.Setters.OfType<Setter>())
 			{
@@ -121,96 +127,128 @@ namespace Reactivity.Iterative.Emitters
 		}
 
 
-		IAnimationValueCore IAnimationEmitterBaseCore.From => FromBase;
-
-		IAnimationValueCore IAnimationEmitterBaseCore.To => ToBase;
-
-
-		protected abstract IAnimationValueCore FromBase { get; }
-
-		protected abstract IAnimationValueCore ToBase { get; }
-
-
-		event ParameterizedEventHandler<IAnimationValueCore> IAnimationEmitterBaseCore.FromPropertyChanged
+		IAnimatedValue IAnimationTimelineEmitter.From
 		{
-			add { HookFromPropertyChangedBase(value); }
-			remove { UnhookFromPropertyChangedBase(value); }
+			get => FromBase;
 		}
 
-		event ParameterizedEventHandler<IAnimationValueCore> IAnimationEmitterBaseCore.ToPropertyChanged
+		IAnimatedValue IAnimationTimelineEmitter.To
 		{
-			add { HookToPropertyChangedBase(value); }
-			remove { UnhookToPropertyChangedBase(value); }
+			get => ToBase;
 		}
 
 
-		protected abstract void HookFromPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> from);
+		protected abstract IAnimatedValue FromBase { get; }
 
-		protected abstract void UnhookFromPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> from);
-
-
-		protected abstract void HookToPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> to);
-
-		protected abstract void UnhookToPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> to);
+		protected abstract IAnimatedValue ToBase { get; }
 
 
-		AnimationTimeline IAnimationEmitterBaseCore.Emit(int index, int totalSteps, object currentValue)
-			=> EmitBase(index, totalSteps, currentValue);
 
-		protected abstract AnimationTimeline EmitBase(int index, int totalSteps, object currentValue);
-
-
-		public static void ReceiveTypeConverter(object targetObject, XamlSetTypeConverterEventArgs eventArgs)
+		event IAnimatedValueChangedHandler IAnimationTimelineEmitter.FromPropertyChanged
 		{
-			TypeConverterInjectionCore.HandlePropertySet(targetObject, eventArgs);
+			add => HookFromPropertyChangedBase(value);
+			remove => UnhookFromPropertyChangedBase(value);
+		}
+
+		event IAnimatedValueChangedHandler IAnimationTimelineEmitter.ToPropertyChanged
+		{
+			add => HookToPropertyChangedBase(value);
+			remove => UnhookToPropertyChangedBase(value);
+		}
+
+
+		protected abstract void HookFromPropertyChangedBase(IAnimatedValueChangedHandler from);
+
+		protected abstract void UnhookFromPropertyChangedBase(IAnimatedValueChangedHandler from);
+
+
+		protected abstract void HookToPropertyChangedBase(IAnimatedValueChangedHandler to);
+
+		protected abstract void UnhookToPropertyChangedBase(IAnimatedValueChangedHandler to);
+
+
+		AnimationTimeline IAnimationTimelineEmitter.Emit(
+			int index,
+			int totalSteps,
+			object currentValue)
+		{
+			return EmitBase(index, totalSteps, currentValue);
+		}
+
+		protected abstract AnimationTimeline EmitBase(
+			int index,
+			int totalSteps,
+			object currentValue);
+
+
+		public static void ReceiveTypeConverter(
+			object targetObject,
+			XamlSetTypeConverterEventArgs eventArgs)
+		{
+			TypeConverterInjectionCore.HandlePropertySet(
+				targetObject,
+				eventArgs);
 		}
 	}
 
 	[XamlSetTypeConverter(nameof(ReceiveTypeConverter))]
-	public abstract class AnimationEmitterBase<T> : AnimationEmitterBase where T : struct
+	public abstract class AnimationEmitterBase<TValue>
+		: AnimationEmitterBase 
+			where TValue
+			: struct
 	{
 		public static readonly DependencyProperty FromProperty = DP.Register(
-			new Meta<AnimationEmitterBase<T>, AnimationValue<T>>(new LiteralAnimationValue<T>(null),
+			new Meta<AnimationEmitterBase<TValue>, AnimatedValueBase<TValue>>(
+				new LiteralAnimatedValue<TValue>(null),
 				FromPropertyChangedCallback), IsValidAnimationValue);
 
 		public static readonly DependencyProperty ToProperty = DP.Register(
-			new Meta<AnimationEmitterBase<T>, AnimationValue<T>>(new LiteralAnimationValue<T>(null),
+			new Meta<AnimationEmitterBase<TValue>, AnimatedValueBase<TValue>>(
+				new LiteralAnimatedValue<TValue>(null),
 				ToPropertyChangedCallback), IsValidAnimationValue);
 
 
-		public AnimationValue<T> From
+		public AnimatedValueBase<TValue> From
 		{
-			get { return (AnimationValue<T>)GetValue(FromProperty); }
-			set { SetValue(FromProperty, value); }
+			get => (AnimatedValueBase<TValue>)GetValue(FromProperty);
+			set => SetValue(FromProperty, value);
 		}
-		public AnimationValue<T> To
+		public AnimatedValueBase<TValue> To
 		{
-			get { return (AnimationValue<T>)GetValue(ToProperty); }
-			set { SetValue(ToProperty, value); }
-		}
-
-		protected sealed override IAnimationValueCore FromBase => From;
-		protected sealed override IAnimationValueCore ToBase => To;
-
-		//protected sealed override ParameterizedEventHandler<IAnimationValueCore> ToPropertyChangedBase => From;
-		//protected sealed override ParameterizedEventHandler<IAnimationValueCore> ToPropertyChangedBase => To;
-
-
-		public event ParameterizedEventHandler<AnimationValue<T>> FromPropertyChanged;
-		public event ParameterizedEventHandler<AnimationValue<T>> ToPropertyChanged;
-
-
-		private static void FromPropertyChangedCallback(AnimationEmitterBase<T> i, DPChangedEventArgs<AnimationValue<T>> e)
-		{
-			i.FromPropertyChanged.Raise(e.NewValue);
-		}
-		private static void ToPropertyChangedCallback(AnimationEmitterBase<T> i, DPChangedEventArgs<AnimationValue<T>> e)
-		{
-			i.ToPropertyChanged.Raise(e.NewValue);
+			get => (AnimatedValueBase<TValue>)GetValue(ToProperty);
+			set => SetValue(ToProperty, value);
 		}
 
 
-		protected sealed override void HookFromPropertyChangedBase(ParameterizedEventHandler<IAnimationValueCore> from)
+		protected sealed override IAnimatedValue FromBase
+		{
+			get => From;
+		}
+		protected sealed override IAnimatedValue ToBase
+		{
+			get => To;
+		}
+		
+		public event AnimatedValueBaseChangedHandler<TValue> FromPropertyChanged;
+		public event AnimatedValueBaseChangedHandler<TValue> ToPropertyChanged;
+
+
+		private static void FromPropertyChangedCallback(
+			AnimationEmitterBase<TValue> @this, 
+			DPChangedEventArgs<AnimatedValueBase<TValue>> args)
+		{
+			@this.FromPropertyChanged?.Invoke(args.NewValue);
+		}
+		private static void ToPropertyChangedCallback(
+			AnimationEmitterBase<TValue> @this,
+			DPChangedEventArgs<AnimatedValueBase<TValue>> args)
+		{
+			@this.ToPropertyChanged?.Invoke(args.NewValue);
+		}
+
+
+		protected sealed override void HookFromPropertyChangedBase(
+			ParameterizedEventHandler<IAnimationValueCore> from)
 		{
 			FromPropertyChanged += from;
 		}

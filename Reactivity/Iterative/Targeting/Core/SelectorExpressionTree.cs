@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media.Animation;
+using Ccr.PresentationCore.Helpers.DependencyHelpers;
 using Core.Helpers;
 using Core.Helpers.DependencyHelpers;
 using Reactivity.Iterative.Targeting.Selectors;

@@ -4,28 +4,34 @@ using Core.Extensions;
 
 namespace Reactivity.Iterative.Emitters.MatrixAnimations.MatrixComposition
 {
-	public class LinearMatrixComposition : MatrixCompositionBase
+	public class LinearMatrixComposition 
+		: MatrixCompositionBase
 	{
 		private int length = 4;
 		public int Length
 		{
-			get { return length; }
+			get => length;
 			set
 			{
 				if (length < 1)
 					throw new ArgumentOutOfRangeException(nameof(Length));
+
 				length = value;
 			}
 		}
 
 
-		public override IEnumerable<IEnumerable<double>> ComposeMatrix(IEnumerable<double> source)
+		public override IEnumerable<IEnumerable<double>> ComposeMatrix(
+			IEnumerable<double> source)
 		{
 			return source.Chunk(Length);
 		}
 
-		public override MatrixCoordinate GetMatrixCoordinate(int index, int size)
+		public override MatrixCoordinate GetMatrixCoordinate(
+			int index, 
+			int size)
 		{
+
 			if (index < 0)
 				throw new ArgumentOutOfRangeException(nameof(index));
 

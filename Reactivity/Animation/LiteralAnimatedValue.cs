@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Reactivity.Animation
 {
@@ -10,9 +6,17 @@ namespace Reactivity.Animation
 		: AnimatedValueBase<TValue>
 			where TValue : struct
 	{
-		public override TValue? GetEffectiveValue(TValue? currentValue)
+		private TValue _value;
+
+		public LiteralAnimatedValue(
+			TValue value)
 		{
-			throw new NotImplementedException();
+			_value = value;
+		}
+		public override TValue? GetEffectiveValue(
+			TValue? currentValue)
+		{
+
 		}
 	}
 }

@@ -1,11 +1,14 @@
-﻿using System.Windows.Markup;
-using Core.Helpers;
+﻿using System.Collections.Generic;
+using System.Windows.Markup;
+using Ccr.Introspective.Extensions;
+using Ccr.Introspective.Infrastructure;
 using Reactivity.Iterative.Targeting.Core;
 
 namespace Reactivity.Iterative.Targeting.Selectors
 {
-	[ContentProperty("NextSelector")]
-	public class MethodCallSelector : ElementSelectorBase
+	[ContentProperty(nameof(NextSelector))]
+	public class MethodCallSelector
+		: ElementSelectorBase
 	{
 		public string MethodName { get; set; }
 
@@ -17,9 +20,15 @@ namespace Reactivity.Iterative.Targeting.Selectors
 		}
 
 		//TODO supporting Parameters and parameter selectors
-		protected override object ResolveImpl(object parent, ref SelectorTreeResolutionContext context)
+		protected override object ResolveImpl(
+			object parent, 
+			ref SelectorTreeResolutionContext context)
 		{
-			return parent.InvokeMethod<object>(MethodName);
+			return parent
+				.Reflect()
+				.InvokeMethod<object>(
+					MemberDescriptor.Any,
+					MethodName);
 		}
 	}
 }

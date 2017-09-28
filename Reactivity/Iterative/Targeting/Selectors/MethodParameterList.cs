@@ -1,8 +1,10 @@
-﻿using Reactivity.Collections;
+﻿using Ccr.Xaml.Collections;
 
 namespace Reactivity.Iterative.Targeting.Selectors
 {
-	public class MethodParameterList : DependencyObjectCollection<MethodParameterSelector>
+	public class MethodParameterList 
+		: ReactiveDependencyObjectCollection<
+				MethodParameterSelector>
 	{
 
 	}

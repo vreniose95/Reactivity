@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Ccr.Core.Extensions;
 
 namespace Reactivity.Animation
 {
@@ -20,7 +17,7 @@ namespace Reactivity.Animation
 		public RelativeAnimatedValue(
 			Expression<Func<TValue, TValue>> valueExpression)
 		{
-			valueExpression.
+			valueExpression.IsNotNull(nameof(valueExpression));
 		}
 
 		public override TValue? GetEffectiveValue(TValue? currentValue)

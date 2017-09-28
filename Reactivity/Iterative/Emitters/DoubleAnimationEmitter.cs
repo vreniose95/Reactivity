@@ -3,7 +3,8 @@ using Core.Extensions;
 
 namespace Reactivity.Iterative.Emitters
 {
-	public class DoubleAnimationEmitter : AnimationEmitterBase<double>
+	public class DoubleAnimationEmitter
+		: AnimationEmitterBase<double>
 	{
 		//protected override void OnAttached()
 		//{
@@ -22,7 +23,8 @@ namespace Reactivity.Iterative.Emitters
 		//	}
 		//}
 
-		public override AnimationTimeline Emit(int index, int totalSteps, double? currentValue)
+		public override AnimationTimeline Emit(
+			int index, int totalSteps, double? currentValue)
 		{
 			var stepOffset = IterativeOffset.GetStepOffset(totalSteps);
 			var currentOffset = BeginTime + stepOffset.MultipliedBy(index);

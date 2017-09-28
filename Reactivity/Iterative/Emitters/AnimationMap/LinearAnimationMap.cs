@@ -1,11 +1,13 @@
 ﻿using System.Windows;
-using Core.Helpers.DependencyHelpers;
+using System.Windows.Media.Animation;
+using Ccr.PresentationCore.Helpers.DependencyHelpers;
 
 namespace Reactivity.Iterative.Emitters.AnimationMap
 {
 	//TODO use a DoubleAnimationUsingKeyFrames or similar
 	public class LinearAnimationMap : AnimationMapBase
 	{
+		DoubleAnimationUsingKeyFrames
 		public static readonly DependencyProperty StartPointProperty = DP.Register(
 			new Meta<LinearAnimationMap, Point>(new Point(0.0, 0.0), onStartPointChanged));
 
